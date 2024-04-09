@@ -97,10 +97,10 @@ public class AruodasMiestaiDropdowns {
     }
     @Test
     public void aruodasAddressLoop(){
-        String savivaldybe = "Šiauliai";//region
-        String gyvenviete = "Žaliūkių k.";//town
+        String savivaldybe = "Kretingos";//region
+        String gyvenviete = "Alko k.";//town
         String mikrorajonas = "Šventoji";//quartal
-        String gatve = "Danės g.";//street
+        String gatve = "Danės";//street
         String otipas = "Sklypai kaime";//object type
         List<String> parameters = new ArrayList<>();
         parameters.add(savivaldybe);
@@ -108,18 +108,25 @@ public class AruodasMiestaiDropdowns {
         parameters.add(mikrorajonas);
         parameters.add(gatve);
         parameters.add(otipas);
-        int parameterCounter = 0;
-        int dropListCounter = 3;
-
-        for (int i = 0; i < 5; i++) {
-            if (_globalDriver.findElement(By.xpath("html/body/div[1]/div[2]/form/ul/li[" + dropListCounter + "]")).getAttribute("class").contains("field-disabled")){
-                parameterCounter++;
-                dropListCounter++;
-                i--;
-                continue;//if drop list is hidden repeats loop with next parameter and droplist
+        int parameterCounter = -1;
+        int dropListCounter = 2;
+        int listcounter = -1;
+        for (int i = 0; i < 4; i++) {
+            listcounter++;
+            parameterCounter++;
+            dropListCounter++;
+            try {
+                TimeUnit.SECONDS.sleep(1);
+            }catch (InterruptedException e) {
+                e.printStackTrace();
             }
-            if (parameterCounter > 5){
+            if (parameterCounter > 4){
                 break;
+            }////*[@id="newObjectForm"]/ul/li[4] ////*[@id="newObjectForm"]/ul/li[3]
+            if (_globalDriver.findElement(By.xpath("//*[@id=" + "\"newObjectForm\"" + "]/ul/li[" + dropListCounter + "]")).getAttribute("class").contains("field-disabled")){
+
+                listcounter--;
+                continue;//if drop list is hidden repeats loop with next parameter and droplist
             }
             //System.out.println(dropListCounter);          ///html/body/div[1]/div[2]/form/ul/li[6]/span[1]/input[2]
             _globalDriver.findElement(By.xpath("html/body/div[1]/div[2]/form/ul/li[" + dropListCounter + "]/span[1]/input[2]")).click();//click on drop list
@@ -128,23 +135,27 @@ public class AruodasMiestaiDropdowns {
                 TimeUnit.SECONDS.sleep(1);
             } catch (InterruptedException e) {
                 e.printStackTrace();
-            }
+            }//dropdown-input-value-title //dropdown-input-values-address
             List<WebElement> dropList = _globalDriver.findElements(By.className("dropdown-input-values-address"));//creates list of non hiden droplits
             //System.out.println(dropList.size());
-            String droplistId = dropList.get(i).getAttribute("id");//gets droplist id
+            String droplistId = dropList.get(listcounter).getAttribute("id");//gets droplist id
             List<WebElement> droplistElements = _globalDriver.findElement(By.id(droplistId)).findElements(By.className("drop-down-value-row"));//gets all elements in droplist
+
             for(WebElement element: droplistElements){//go through all elements, click when match is found and stop loop
                 if(element.getText().contains(parameters.get(parameterCounter))){
                     element.click();
                     break;
                 }
-            }            try {
-                TimeUnit.SECONDS.sleep(1);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
             }
-        parameterCounter++;
-        dropListCounter++;
+        }
+        _globalDriver.findElement(By.xpath("//*[@id=\"newObjectForm\"]/ul/li[7]/span[1]/input[2]")).click();
+        List<WebElement> types = _globalDriver.findElement(By.xpath("//*[@id=\"newObjectForm\"]/ul/li[7]/span[1]/ul")).findElements(By.tagName("li"));
+        //System.out.println(types.size());
+        for(WebElement type: types){
+            if(type.getText().contains(otipas)){
+                type.click();
+                break;
+            }
         }
 
     }
